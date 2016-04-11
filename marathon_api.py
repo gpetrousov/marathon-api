@@ -25,11 +25,9 @@ def scale_app(marathon_url, app_id, instances = 1):
     print(r.status_code)
     return
 
-
 #=====-----=====#
 #=====-----=====#
 #=====-----=====#
-
 
 def get_nof_instances(marathon_url, app_id):
     """
@@ -48,13 +46,9 @@ def get_nof_instances(marathon_url, app_id):
     print(r.status_code)
     return nof_instances
 
-
-
 #=====-----=====#
 #=====-----=====#
 #=====-----=====#
-
-
 
 def get_hosts(marathon_url, app_id):
     """
@@ -81,6 +75,70 @@ def get_hosts(marathon_url, app_id):
 #=====-----=====#
 #=====-----=====#
 
+def get_ports(marathon_url, app_id):
+    """
+    Get ports on which app listens on.
+    marathon_url : [string] the URL of the marathon service
+    app_id : [string] ID of the running marathon app
+    Method : GET
+    Return : list of ports
+    """
+
+    api_endpoint = '/v2/apps/'
+    headers = {'Content-Type': 'application/json'}
+    url = marathon_url + api_endpoint + app_id
+    print(url)
+    r = requests.get(url, headers=headers)
+    print(r.status_code)
+    return r.json()['app']['ports']
+
+#=====-----=====#
+#=====-----=====#
+#=====-----=====#
+
+def get_containerports(marathon_url, app_id):
+    """
+    Get containerports if we have portmapping.
+    marathon_url : [string] the URL of the marathon service
+    app_id : [string] ID of the running marathon app
+    Method : GET
+    Return : list of ports
+    """
+
+    api_endpoint = '/v2/apps/'
+    headers = {'Content-Type': 'application/json'}
+    url = marathon_url + api_endpoint + app_id
+    print(url)
+    r = requests.get(url, headers=headers)
+    print(r.status_code)
+    containerports = []
+    for portmapping in r.json()['app']['container']['docker']['portMappings']:
+        containerports.append(portmapping['containerPort'])
+    return containerports
+
+#=====-----=====#
+#=====-----=====#
+#=====-----=====#
+
+def get_hosts_ports(marathon_url, app_id):
+    """
+    Get hosts ports where app app_id runs.
+    marathon_url : [string] the URL of the marathon service
+    app_id : [string] ID of the running marathon app
+    Method : GET
+    Return : list of host IPs
+    """
+
+    api_endpoint = '/v2/apps/'
+    headers = {'Content-Type': 'application/json'}
+    url = marathon_url + api_endpoint + app_id
+    print(url)
+    r = requests.get(url, headers=headers)
+    print(r.status_code)
+    hosts_ports = []
+    for hp in r.json()['app']['tasks']:
+        hosts_ports.append(hp['ports'])
+    return hosts_ports
 
 if __name__ == '__main__':
     marathon_master = input("Enter http://<marathon ip>:<port>")
